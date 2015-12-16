@@ -1,9 +1,7 @@
 package maslab.aiwolf.client;
 
 import java.util.List;
-import java.util.Map;
 
-import org.aiwolf.client.lib.Topic;
 import org.aiwolf.common.data.Talk;
 
 /**
@@ -11,9 +9,9 @@ import org.aiwolf.common.data.Talk;
  */
 public class ConversationInput {
 
-	int lastTalkDay;
-	int lastTalkID;
-	TalkDistributer talkDistributer;
+	private int lastTalkDay;
+	private int lastTalkID;
+	private TalkDistributer talkDistributer;
 
 	/**
 	 * 新しくConversationInputを構築します。
@@ -43,11 +41,12 @@ public class ConversationInput {
 	}
 
 	/**
-	 * 仕分けした会話情報のマップを返します。
+	 * 会話情報を仕分けして保持しているTalkDistributerオブジェクトを返します。
 	 *
-	 * @return 仕分けした会話情報のマップ
+	 * @return 会話情報を仕分けして保持しているオブジェクト
 	 */
-	public Map<Topic, List<Talk>> getTalkDistributer() {
-		return talkDistributer.getTopicTalkMap();
+	public TalkDistributer getTalkDistributer() {
+		return talkDistributer;
 	}
+
 }
