@@ -40,7 +40,9 @@ public final class TalkDistributer {
 
 	/**
 	 * 指定されたTopicの会話のリストを返します。
-	 * @param topic 会話のTopic
+	 *
+	 * @param topic
+	 *            会話のTopic
 	 * @return topicの会話リスト
 	 */
 	public List<Talk> getTalkList(Topic topic) {
@@ -49,7 +51,9 @@ public final class TalkDistributer {
 
 	/**
 	 * 指定された複数のTopicの会話のリストを連結して返します。
-	 * @param topics 会話のtopic
+	 *
+	 * @param topics
+	 *            会話のtopic
 	 * @return topicの会話リスト
 	 */
 	public List<Talk> getTalkList(Topic... topics) {
@@ -61,4 +65,12 @@ public final class TalkDistributer {
 		return talkList;
 	}
 
+	/**
+	 * 各TopicにTalkが関連付けられたマップを返します。
+	 *
+	 * @return 各TopicにTalkが関連付けられたマップ
+	 */
+	public Map<Topic, List<Talk>> getTopicTalkMap() {
+		return topicTalkMap;
+	}
 }
