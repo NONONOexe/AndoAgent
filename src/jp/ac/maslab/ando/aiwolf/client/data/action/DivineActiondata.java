@@ -13,7 +13,7 @@ import jp.ac.maslab.ando.aiwolf.client.data.definition.GiftTag;
  * 占い結果のデータのクラスです。
  * @author keisuke
  */
-public class DivineActiondata extends Judge implements Actiondata {
+public class DivineActionData extends Judge implements ActionData {
 	/**
 	 * 新しく占い結果のデータを構築します。
 	 * @param day 占った日
@@ -21,7 +21,7 @@ public class DivineActiondata extends Judge implements Actiondata {
 	 * @param target 占われたエージェント
 	 * @param result 占い結果により判明したエージェントの種族
 	 */
-	public DivineActiondata(int day, Agent agent, Agent target, Species result) {
+	public DivineActionData(int day, Agent agent, Agent target, Species result) {
 		super(day, agent, target, result);
 	}
 
@@ -29,7 +29,7 @@ public class DivineActiondata extends Judge implements Actiondata {
 	 * 指定されたJudgeオブジェクトを元に新規占い結果のデータを構築します。
 	 * @param judge 元にするJudgeオブジェクト
 	 */
-	public DivineActiondata(Judge judge) {
+	public DivineActionData(Judge judge) {
 		super(judge.getDay(), judge.getAgent(), judge.getTarget(), judge.getResult());
 	}
 

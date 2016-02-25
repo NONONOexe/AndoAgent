@@ -16,7 +16,7 @@ public final class RoleAssignPlayer extends AbstractRoleAssignPlayer {
 	public RoleAssignPlayer() {
 		setWerewolfPlayer(new Werewolf());
 		setVillagerPlayer(new Villager());
-		setBodyguardPlayer(new BodyGuard());
+		setBodyguardPlayer(new Bodyguard());
 		setMediumPlayer(new Medium());
 		setPossessedPlayer(new Possessed());
 		setSeerPlayer(new Seer());

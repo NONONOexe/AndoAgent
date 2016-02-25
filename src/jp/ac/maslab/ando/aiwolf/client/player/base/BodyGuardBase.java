@@ -6,7 +6,7 @@ import org.aiwolf.common.data.Agent;
  * 狩人の基本行動を定義する抽象クラスです。
  * @author keisuke
  */
-public abstract class BodyGuardBase extends VillagerSide {
+public abstract class BodyguardBase extends VillagerSide {
 	@Override
 	public final Agent divine() {
 		return null;

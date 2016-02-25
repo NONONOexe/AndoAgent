@@ -12,14 +12,14 @@ import jp.ac.maslab.ando.aiwolf.client.data.definition.GiftTag;
  * 護衛のデータのクラスです。
  * @author keisuke
  */
-public class GuardActiondata extends Guard implements Actiondata {
+public class GuardActionData extends Guard implements ActionData {
 	/**
 	 * 新しく護衛のデータを構築します。
 	 * @param day 護衛した日
 	 * @param agent 護衛したエージェント
 	 * @param target 護衛されたエージェント
 	 */
-	public GuardActiondata(int day, Agent agent, Agent target) {
+	public GuardActionData(int day, Agent agent, Agent target) {
 		super(day, agent, target);
 	}
 
@@ -27,7 +27,7 @@ public class GuardActiondata extends Guard implements Actiondata {
 	 * 指定されたGuardオブジェクトを元に新規護衛のデータを構築します。
 	 * @param guard 元にするGuardオブジェクト
 	 */
-	public GuardActiondata(Guard guard) {
+	public GuardActionData(Guard guard) {
 		super(guard.getDay(), guard.getAgent(), guard.getTarget());
 	}
 

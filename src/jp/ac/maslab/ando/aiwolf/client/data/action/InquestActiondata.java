@@ -13,7 +13,7 @@ import jp.ac.maslab.ando.aiwolf.client.data.definition.GiftTag;
  * 霊能結果のデータのクラスです。
  * @author keisuke
  */
-public class InquestActiondata extends Judge implements Actiondata {
+public class InquestActionData extends Judge implements ActionData {
 	/**
 	 * 新しく霊能結果のデータを構築します。
 	 * @param day 霊能した日
@@ -21,7 +21,7 @@ public class InquestActiondata extends Judge implements Actiondata {
 	 * @param target 霊能されたエージェント
 	 * @param result 霊能結果により判明したエージェントの種族
 	 */
-	public InquestActiondata(int day, Agent agent, Agent target, Species result) {
+	public InquestActionData(int day, Agent agent, Agent target, Species result) {
 		super(day, agent, target, result);
 	}
 
@@ -29,7 +29,7 @@ public class InquestActiondata extends Judge implements Actiondata {
 	 * 指定されたJudgeオブジェクトを元に新規霊能結果のデータを構築します。
 	 * @param judge 元にするJudgeオブジェクト
 	 */
-	public InquestActiondata(Judge judge) {
+	public InquestActionData(Judge judge) {
 		super(judge.getDay(), judge.getAgent(), judge.getTarget(), judge.getResult());
 	}
 

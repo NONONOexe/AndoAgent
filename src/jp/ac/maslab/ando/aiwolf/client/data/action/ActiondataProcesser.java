@@ -4,9 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 
 import jp.ac.maslab.ando.aiwolf.client.data.definition.Field;
 import jp.ac.maslab.ando.aiwolf.client.tool.ClientSystem;
@@ -17,13 +16,13 @@ import jp.ac.maslab.ando.aiwolf.client.tool.RunMode;
  * @author keisuke
  *
  */
-public class ActiondataProcesser {
-	private ArrayList<Actiondata> cache;
+public class ActionDataProcesser {
+	private ArrayList<ActionData> cache;
 
 	/**
 	 * 新規プロセッサを構築します。
 	 */
-	public ActiondataProcesser() {
+	public ActionDataProcesser() {
 		cache = new ArrayList<>();
 	}
 
@@ -31,7 +30,7 @@ public class ActiondataProcesser {
 	 * 指定された行動データを追加します。
 	 * @param actionData 追加する行動データ
 	 */
-	public void addActionData(Actiondata actionData) {
+	public void addActionData(ActionData actionData) {
 		cache.add(actionData);
 	}
 
@@ -41,7 +40,7 @@ public class ActiondataProcesser {
 	 * @param index 行動データのインデックス
 	 * @return 指定されたインデックスの行動データ
 	 */
-	public Actiondata getActionData(int index) {
+	public ActionData getActionData(int index) {
 		return cache.get(index);
 	}
 
@@ -52,40 +51,46 @@ public class ActiondataProcesser {
 	 * @param directory csvファイルを出力するディレクトリ
 	 * @throws IOException 書き込みに失敗した時に、スローされます。
 	 */
-	public void exportCSVFile(String directory) throws IOException {
-		if (ClientSystem.getInstance().getMode().equals(RunMode.CONTEST)) {
-			return;
-		}
-		String csvDirectoryPath = directory.concat("/csv");
-		File csvDirectory = new File(csvDirectoryPath);
-		if (!csvDirectory.exists()) {
-			csvDirectory.mkdir();
-		}
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-		String fileName = String.format("actiondata%s.csv", sdf.format(date));
-		String filePath = csvDirectoryPath.concat(String.format("/%s", fileName));
-		File csvFile = new File(filePath);
-		if (!csvFile.exists()) {
-			csvFile.createNewFile();
-		} else {
-			System.err.println("同じ名前のcsvファイルが存在しているため、ファイルを作成できませんでした");
-			return;
-		}
-		FileWriter fileWriter = new FileWriter(csvFile);
-		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-		for (int i = 0; i < Field.values().length; i++) {
-			bufferedWriter.write(Field.values()[i].toString());
-			if (i < Field.values().length - 1) {
-				bufferedWriter.write(",");
+	public void exportCSVFile(String pathname) throws IOException {
+		if (ClientSystem.getInstance().getMode().equals(RunMode.DEBUG)) {
+			File csvDirectory = new File(pathname);
+			if (!csvDirectory.exists()) {
+				csvDirectory.mkdirs();
+			}
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			String timeString = timestamp.toString().replaceAll("[\\s-/:.]", "");
+			File csvFile = new File(String.format("%s/actiondata%s.csv", pathname, timeString));
+			if (!csvFile.exists()) {
+				csvFile.createNewFile();
+				writeActiondata(csvFile);
 			} else {
-				bufferedWriter.newLine();
+				System.err.println("同じ名前のcsvファイルが存在しているため、ファイルを作成できませんでした");
 			}
 		}
-		for (Actiondata actionData : cache) {
-			bufferedWriter.write(actionData.convertRecord().toString());
-			bufferedWriter.newLine();
+	}
+
+	/**
+	 * 指定されたファイルに行動データを書き込みます。
+	 * @param csvFile 行動データを書き込むcsv形式ファイル
+	 */
+	private void writeActiondata(File csvFile) {
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFile))) {
+			// 見出しの書き込み
+			for (int i = 0; i < Field.values().length; i++) {
+				bw.write(Field.values()[i].toString());
+				if (i < Field.values().length - 1) {
+					bw.write(",");
+				} else {
+					bw.newLine();
+				}
+			}
+			// データの書き込み
+			for (ActionData actionData : cache) {
+				bw.write(actionData.convertRecord().toString());
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		bufferedWriter.close();
 	}
 }

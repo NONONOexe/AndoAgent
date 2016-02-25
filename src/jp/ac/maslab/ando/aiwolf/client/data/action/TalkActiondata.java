@@ -16,7 +16,7 @@ import jp.ac.maslab.ando.aiwolf.client.data.definition.TalkTag;
  * 会話のデータのクラスです。
  * @author keisuke
  */
-public class TalkActiondata extends Talk implements Actiondata {
+public class TalkActionData extends Talk implements ActionData {
 	/**
 	 * 新しく会話のデータを構築します。
 	 * @param idx 発言ID
@@ -24,7 +24,7 @@ public class TalkActiondata extends Talk implements Actiondata {
 	 * @param agent 発言したエージェント
 	 * @param content 発言の内容
 	 */
-	public TalkActiondata(int idx, int day, Agent agent, String content) {
+	public TalkActionData(int idx, int day, Agent agent, String content) {
 		super(idx, day, agent, content);
 	}
 
@@ -32,7 +32,7 @@ public class TalkActiondata extends Talk implements Actiondata {
 	 * 指定されたTalkオブジェクトを元に新規会話データを構築します。
 	 * @param talk 元にするTalkオブジェクト
 	 */
-	public TalkActiondata(Talk talk) {
+	public TalkActionData(Talk talk) {
 		super(talk.getIdx(), talk.getDay(), talk.getAgent(), talk.getContent());
 	}
 

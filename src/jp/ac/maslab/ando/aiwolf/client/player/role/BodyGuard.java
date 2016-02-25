@@ -2,13 +2,13 @@ package jp.ac.maslab.ando.aiwolf.client.player.role;
 
 import org.aiwolf.common.data.Agent;
 
-import jp.ac.maslab.ando.aiwolf.client.player.base.BodyGuardBase;
+import jp.ac.maslab.ando.aiwolf.client.player.base.BodyguardBase;
 
 /**
  * 狩人の行動を定義するクラスです。
  * @author keisuke
  */
-public final class BodyGuard extends BodyGuardBase {
+public final class Bodyguard extends BodyguardBase {
 	@Override
 	public void dayStart() {
 		super.dayStart();

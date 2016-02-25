@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.aiwolf.common.data.Agent;
+import org.aiwolf.common.util.Pair;
+
 import jp.ac.maslab.ando.aiwolf.client.data.definition.Result;
 
 /**
@@ -12,13 +15,13 @@ import jp.ac.maslab.ando.aiwolf.client.data.definition.Result;
  * @author keisuke
  */
 public class BodyguardLog {
-	private Map<Integer, Result> resultOfDayMap;
+	private Map<Integer, Pair<Agent, Result>> guardOfDayMap;
 
 	/**
 	 * 新しく狩人日記を構築します。
 	 */
 	public BodyguardLog() {
-		resultOfDayMap = new HashMap<>();
+		guardOfDayMap = new HashMap<>();
 	}
 
 	/**
@@ -26,30 +29,31 @@ public class BodyguardLog {
 	 * @param day 護衛日
 	 * @param result 護衛結果
 	 */
-	public void write(int day, Result result) {
-		resultOfDayMap.put(day, result);
+	public void write(int day, Agent agent, Result result) {
+		guardOfDayMap.put(day, new Pair<>(agent, result));
 	}
 
 	/**
-	 * 指定された日の護衛結果を返します。
+	 * 指定された日に護衛したエージェントとその護衛結果の{@code Pair<Agent, Result>}を返します。
 	 * @param day 護衛日
-	 * @return 護衛結果
+	 * @return その日の護衛情報
 	 */
-	public Result read(int day) {
-		return resultOfDayMap.get(day);
+	public Pair<Agent, Result> read(int day) {
+		return guardOfDayMap.get(day);
 	}
 
 	@Override
 	public String toString() {
-		String str = "Day Result\n";
-		ArrayList<Integer> dayList = new ArrayList<>(resultOfDayMap.keySet());
+		String string = "";
+		ArrayList<Integer> dayList = new ArrayList<>(guardOfDayMap.keySet());
 		for (int i = 0; i < dayList.size(); i++) {
 			int day = dayList.get(i);
-			str += String.format("%02d  %s", day, resultOfDayMap.get(day));
-			if (i < dayList.size() - 1) {
-				str += "\n";
+			string += String.format("Day%02d\t%s->%s", day, guardOfDayMap.get(day).getKey(),
+					guardOfDayMap.get(day).getValue());
+			if (i != dayList.size() - 1) {
+				string += "\n";
 			}
 		}
-		return str;
+		return string;
 	}
 }

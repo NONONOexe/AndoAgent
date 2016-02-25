@@ -11,7 +11,7 @@ import jp.ac.maslab.ando.aiwolf.client.data.definition.GiftTag;
  * 人狼の襲撃のデータのクラスです。
  * @author keisuke
  */
-public class AttackActiondata implements Actiondata {
+public class AttackActionData implements ActionData {
 	private int day;
 	private Agent agent;
 	private Agent target;
@@ -22,7 +22,7 @@ public class AttackActiondata implements Actiondata {
 	 * @param agent 襲撃するエージェント
 	 * @param target 襲撃されたエージェント
 	 */
-	public AttackActiondata(int day, Agent agent, Agent target) {
+	public AttackActionData(int day, Agent agent, Agent target) {
 		this.day = day;
 		this.agent = agent;
 		this.target = target;
