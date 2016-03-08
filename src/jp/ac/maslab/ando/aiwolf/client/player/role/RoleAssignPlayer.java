@@ -8,7 +8,7 @@ import org.aiwolf.client.base.player.AbstractRoleAssignPlayer;
  */
 public final class RoleAssignPlayer extends AbstractRoleAssignPlayer {
 
-	private String name = "ando";
+	private String name = "Ando";
 
 	/**
 	 * 新規プレイヤーを構築します。

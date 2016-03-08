@@ -1,60 +1,98 @@
 package jp.ac.maslab.ando.aiwolf.client.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
 
 /**
- * COに関する情報です。
+ * COに関する情報を保持します。
  * @author keisuke
+ *
  */
 public class COInfo {
 	/**
-	 * エージェントにそのエージェントがCOした役職を関連付けたマップです。
+	 * エージェントにCOした役職を関連付けたマップです。
 	 */
 	private Map<Agent, Role> agentRoleMap;
+	/**
+	 * 各役職とその数を関連付けたマップです。
+	 */
+	private Map<Role, Integer> roleNumberMap;
 
 	/**
-	 * 新しくCO情報を構築します。
+	 * COに関する情報を保持するオブジェクトを構築します。
 	 */
-	public COInfo() {
+	public COInfo(Map<Role, Integer> roleNumberMap) {
 		agentRoleMap = new HashMap<>();
+		this.roleNumberMap = roleNumberMap;
 	}
 
 	/**
-	 * 指定されたエージェントがCOした役職を返します。
+	 * カミングアウトを追加します。
+	 * @param co カミングアウト
+	 */
+	public void addComingout(Comingout co) {
+		agentRoleMap.put(co.getAgent(), co.getRole());
+	}
+
+	/**
+	 * 指定された役職にCOしているエージェントのリストを返します。指定された役職にCOしたエージェントが存在しない場合は空のリストを返します。
+	 * @param role 役職
+	 * @return 指定された役職にCOしているエージェントのリスト
+	 */
+	public List<Agent> getCOAgentList(Role role) {
+		List<Agent> coAgentList = new ArrayList<>();
+		for (Agent agent : agentRoleMap.keySet()) {
+			if (agentRoleMap.get(agent).equals(role)) {
+				coAgentList.add(agent);
+			}
+		}
+		return coAgentList;
+	}
+
+	/**
+	 * 指定されたエージェントがCOしている役職を返します。
 	 * @param agent エージェント
-	 * @return 指定したエージェントがCOした役職
+	 * @return 指定されたエージェントがCOしている役職
 	 */
 	public Role getCORole(Agent agent) {
 		return agentRoleMap.get(agent);
 	}
 
 	/**
-	 * 指定された役職にCOしたエージェントのセットを返します。
+	 * 指定された役職にCOしている人数を返します。
 	 * @param role 役職
-	 * @return 指定した役職にCOしたエージェントのセット
+	 * @return 指定された役職にCOしている人数
 	 */
-	public Set<Agent> getCOAgentSet(Role role) {
-		Set<Agent> agentSet = new HashSet<>();
+	public int getNumberOfCOAgent(Role role) {
+		int numberOfCOAgent = 0;
 		for (Agent agent : agentRoleMap.keySet()) {
 			if (agentRoleMap.get(agent).equals(role)) {
-				agentSet.add(agent);
+				numberOfCOAgent++;
 			}
 		}
-		return agentSet;
+		return numberOfCOAgent;
 	}
 
 	/**
-	 * COしたエージェントとそのCOに含まれる役職を情報として追加します。
-	 * @param agent COしたエージェント
-	 * @param role COした役職
+	 * 指定されたエージェントがCOしているかどうかを返します。
+	 * @param agent エージェント
+	 * @return 指定されたエージェントがCOしているかどうか
 	 */
-	public void addCOAgentRole(Agent agent, Role role) {
-		agentRoleMap.put(agent, role);
+	public boolean hasTalkedCO(Agent agent) {
+		return agentRoleMap.containsKey(agent);
+	}
+
+	/**
+	 * 指定した役職について設定人数よりCOしたエージェントのほうが多いかどうかを返します。
+	 * @param role 役職
+	 * @return 設定人数よりCOしたエージェントが多いかどうか
+	 */
+	public boolean isOverCapatityCORole(Role role) {
+		return roleNumberMap.get(role) < getNumberOfCOAgent(role);
 	}
 }
