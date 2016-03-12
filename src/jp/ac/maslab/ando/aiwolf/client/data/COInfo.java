@@ -11,7 +11,6 @@ import org.aiwolf.common.data.Role;
 /**
  * COに関する情報を保持します。
  * @author keisuke
- *
  */
 public class COInfo {
 	/**
@@ -19,7 +18,11 @@ public class COInfo {
 	 */
 	private Map<Agent, Role> agentRoleMap;
 	/**
-	 * 各役職とその数を関連付けたマップです。
+	 * 今までされた全てのCOを保持するリストです。
+	 */
+	private List<Comingout> coList;
+	/**
+	 * 各役職とその設定人数を関連付けたマップです。
 	 */
 	private Map<Role, Integer> roleNumberMap;
 
@@ -27,7 +30,8 @@ public class COInfo {
 	 * COに関する情報を保持するオブジェクトを構築します。
 	 */
 	public COInfo(Map<Role, Integer> roleNumberMap) {
-		agentRoleMap = new HashMap<>();
+		this.agentRoleMap = new HashMap<>();
+		this.coList = new ArrayList<>();
 		this.roleNumberMap = roleNumberMap;
 	}
 
@@ -37,6 +41,7 @@ public class COInfo {
 	 */
 	public void addComingout(Comingout co) {
 		agentRoleMap.put(co.getAgent(), co.getRole());
+		coList.add(co);
 	}
 
 	/**
@@ -55,12 +60,16 @@ public class COInfo {
 	}
 
 	/**
-	 * 指定されたエージェントがCOしている役職を返します。
+	 * 指定されたエージェントがCOしている役職を返します。指定されたエージェントがCOしていない場合はnullを返します。
 	 * @param agent エージェント
 	 * @return 指定されたエージェントがCOしている役職
 	 */
 	public Role getCORole(Agent agent) {
-		return agentRoleMap.get(agent);
+		if (agentRoleMap.containsKey(agent)) {
+			return agentRoleMap.get(agent);
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -90,7 +99,7 @@ public class COInfo {
 	/**
 	 * 指定した役職について設定人数よりCOしたエージェントのほうが多いかどうかを返します。
 	 * @param role 役職
-	 * @return 設定人数よりCOしたエージェントが多いかどうか
+	 * @return 設定人数よりCOしたエージェントのほうが多いならtrue、そうでない場合はfalse
 	 */
 	public boolean isOverCapatityCORole(Role role) {
 		return roleNumberMap.get(role) < getNumberOfCOAgent(role);
