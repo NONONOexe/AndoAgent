@@ -1,4 +1,4 @@
-package jp.ac.maslab.ando.aiwolf.client.data.action;
+package jp.ac.maslab.ando.aiwolf.client.tool.data;
 
 /**
  * 行動データのインターフェースです。

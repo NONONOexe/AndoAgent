@@ -13,6 +13,7 @@ import jp.ac.maslab.ando.aiwolf.client.data.COInfo;
 import jp.ac.maslab.ando.aiwolf.client.data.Comingout;
 import jp.ac.maslab.ando.aiwolf.client.data.FirstPersonEvaluator;
 import jp.ac.maslab.ando.aiwolf.client.data.RoleForecast;
+import jp.ac.maslab.ando.aiwolf.client.tool.util.AIWolfTools;
 
 /**
  * 全役職に共通する処理を行うクラスです。
@@ -114,6 +115,8 @@ public abstract class RoleBase extends AbstractRole {
 
 	@Override
 	public void finish() {
+		System.out.println("=============================================");
+		System.out.println(AIWolfTools.debugLog);
 	}
 
 	/**

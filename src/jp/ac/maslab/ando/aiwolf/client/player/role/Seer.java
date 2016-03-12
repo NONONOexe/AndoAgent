@@ -12,6 +12,7 @@ import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
 import jp.ac.maslab.ando.aiwolf.client.player.base.SeerBase;
+import jp.ac.maslab.ando.aiwolf.client.tool.util.AIWolfTools;
 
 /**
  * 占い師の行動を定義するクラスです。
@@ -52,7 +53,9 @@ public final class Seer extends SeerBase {
 	public void dayStart() {
 		super.dayStart();
 		// 襲撃されたエージェントを白と判定
-		getRoleForecast().estimateWhite(getLatestDayGameInfo().getAttackedAgent());
+		if (getLatestDayGameInfo().getAttackedAgent() != null) {
+			getRoleForecast().estimateWhite(getLatestDayGameInfo().getAttackedAgent());
+		}
 
 		// 占いCOが2人以上いたときに1人が襲撃されたことで残りのCOしたエージェントが黒だと判明したときの処理
 		if (getCOInfo().isOverCapatityCORole(Role.MEDIUM)
@@ -63,6 +66,11 @@ public final class Seer extends SeerBase {
 			getRoleForecast().estimateBlack(blackAgentList);
 			getRoleForecast().estimateRole(getLatestDayGameInfo().getAttackedAgent(), Role.MEDIUM);
 		}
+
+		AIWolfTools.println("day" + getDay());
+		AIWolfTools.println("====daystart====");
+		AIWolfTools.println("black agent:\t" + getRoleForecast().getBlackAgentList());
+		AIWolfTools.println("white agent:\t" + getRoleForecast().getWhiteAgentList());
 	}
 
 	@Override
@@ -84,11 +92,12 @@ public final class Seer extends SeerBase {
 				cadidates.add(agent);
 			}
 		}
-		return cadidates.get(0);
+		return cadidates.isEmpty() ? getViabilityInfo().getAliveAgentList().get(0) : cadidates.get(0);
 	}
 
 	@Override
 	public void finish() {
+		super.finish();
 	}
 
 	@Override
