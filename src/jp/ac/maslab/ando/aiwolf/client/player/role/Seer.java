@@ -12,7 +12,6 @@ import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
 import jp.ac.maslab.ando.aiwolf.client.player.base.SeerBase;
-import jp.ac.maslab.ando.aiwolf.client.tool.util.AIWolfTools;
 
 /**
  * 占い師の行動を定義するクラスです。
@@ -67,10 +66,6 @@ public final class Seer extends SeerBase {
 			getRoleForecast().estimateRole(getLatestDayGameInfo().getAttackedAgent(), Role.MEDIUM);
 		}
 
-		AIWolfTools.println("day" + getDay());
-		AIWolfTools.println("====daystart====");
-		AIWolfTools.println("black agent:\t" + getRoleForecast().getBlackAgentList());
-		AIWolfTools.println("white agent:\t" + getRoleForecast().getWhiteAgentList());
 	}
 
 	@Override

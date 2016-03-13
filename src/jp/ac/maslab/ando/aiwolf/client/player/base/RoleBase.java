@@ -5,12 +5,12 @@ import java.util.List;
 import org.aiwolf.client.base.player.AbstractRole;
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.client.lib.Utterance;
+import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
 import org.aiwolf.common.net.GameSetting;
 
 import jp.ac.maslab.ando.aiwolf.client.data.COInfo;
-import jp.ac.maslab.ando.aiwolf.client.data.Comingout;
 import jp.ac.maslab.ando.aiwolf.client.data.FirstPersonEvaluator;
 import jp.ac.maslab.ando.aiwolf.client.data.RoleForecast;
 import jp.ac.maslab.ando.aiwolf.client.tool.util.AIWolfTools;
@@ -92,14 +92,10 @@ public abstract class RoleBase extends AbstractRole {
 		while (readTalkNum < gameInfo.getTalkList().size()) {
 			Talk talk = talkList.get(readTalkNum);
 
-			// ====COInfoの更新====
+			// TopicがCominoutのTalkから、COInfoを更新
 			Utterance utterance = new Utterance(talk.getContent());
 			if (utterance.getTopic().equals(Topic.COMINGOUT)) {
-				coInfo.addComingout(new Comingout(
-						talk.getDay(),
-						talk.getIdx(),
-						utterance.getTarget(),
-						utterance.getRole()));
+				coInfo.addComingout(AIWolfTools.convertToComingout(talk));
 			}
 
 			// ====TalkInfoの更新====
@@ -115,8 +111,12 @@ public abstract class RoleBase extends AbstractRole {
 
 	@Override
 	public void finish() {
+		System.out.println("finish");
+		System.out.println("========COInfo========");
+		System.out.println("Comingout Agents:" + coInfo.getCOAgentList());
+		System.out.println("Medium CO:" + coInfo.getCOAgentList(Role.MEDIUM));
+		System.out.println("Seer CO:" + coInfo.getCOAgentList(Role.SEER));
 		System.out.println("=============================================");
-		System.out.println(AIWolfTools.debugLog);
 	}
 
 	/**

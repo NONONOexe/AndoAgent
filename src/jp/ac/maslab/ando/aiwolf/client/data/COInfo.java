@@ -45,13 +45,21 @@ public class COInfo {
 	}
 
 	/**
+	 * COしているエージェントをリストで返します。
+	 * @return COしているエージェントのリスト
+	 */
+	public List<Agent> getCOAgentList() {
+		return new ArrayList<>(agentRoleMap.keySet());
+	}
+
+	/**
 	 * 指定された役職にCOしているエージェントのリストを返します。指定された役職にCOしたエージェントが存在しない場合は空のリストを返します。
 	 * @param role 役職
 	 * @return 指定された役職にCOしているエージェントのリスト
 	 */
 	public List<Agent> getCOAgentList(Role role) {
 		List<Agent> coAgentList = new ArrayList<>();
-		for (Agent agent : agentRoleMap.keySet()) {
+		for (Agent agent : getCOAgentList()) {
 			if (agentRoleMap.get(agent).equals(role)) {
 				coAgentList.add(agent);
 			}
