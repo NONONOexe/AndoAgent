@@ -5,6 +5,7 @@ import java.util.List;
 import org.aiwolf.client.base.player.AbstractRole;
 import org.aiwolf.client.lib.Topic;
 import org.aiwolf.client.lib.Utterance;
+import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Role;
 import org.aiwolf.common.data.Talk;
 import org.aiwolf.common.net.GameInfo;
@@ -33,6 +34,10 @@ public abstract class RoleBase extends AbstractRole {
 	 */
 	private TalkInfo talkInfo;
 	/**
+	 * 各エージェントの生死に関する情報です。
+	 */
+	private ViabilityInfo viabilityInfo;
+	/**
 	 * 役職の予想です。
 	 */
 	private RoleForecast roleForecast;
@@ -41,9 +46,13 @@ public abstract class RoleBase extends AbstractRole {
 	 */
 	private FirstPersonEvaluator evaluator;
 	/**
-	 * 各エージェントの生死に関する情報です。
+	 * 時間を管理します。
 	 */
-	private ViabilityInfo viabilityInfo;
+	private TimeManager timeManager;
+	/**
+	 * 投票先を決定します。
+	 */
+	private VoteTargetSelector voteTargetSelector;
 
 	/**
 	 * 全役職の共通戦略を構築します。
@@ -59,10 +68,15 @@ public abstract class RoleBase extends AbstractRole {
 		viabilityInfo = new ViabilityInfo(gameInfo.getAgentList());
 		roleForecast = new RoleForecast(gameInfo.getAgentList());
 		evaluator = new FirstPersonEvaluator(gameInfo.getAgentList(), getMe());
+		timeManager = new TimeManager();
+		voteTargetSelector = new VoteTargetSelector(timeManager);
 	}
 
 	@Override
 	public void dayStart() {
+		// 日にちを進める
+		timeManager.moveNextDay();
+
 		// readTalkNumの初期化
 		readTalkNum = 0;
 
@@ -86,19 +100,21 @@ public abstract class RoleBase extends AbstractRole {
 	@Override
 	public void update(GameInfo gameInfo) {
 		super.update(gameInfo);
+		// ターンを進める
+		timeManager.moveNextTurn();
 
 		List<Talk> talkList = gameInfo.getTalkList();
 
 		while (readTalkNum < gameInfo.getTalkList().size()) {
 			Talk talk = talkList.get(readTalkNum);
 
-			// TopicがCominoutのTalkから、COInfoを更新
+			// TopicがCominoutのTalkから、COInfoを更新します。
 			Utterance utterance = new Utterance(talk.getContent());
 			if (utterance.getTopic().equals(Topic.COMINGOUT)) {
 				coInfo.addComingout(AIWolfTools.convertToComingout(talk));
 			}
 
-			// ====TalkInfoの更新====
+			// talkInfoにtalkを追加します。
 			talkInfo.addTalk(talk);
 
 			// ====FirstPersonEvaluatorの更新====
@@ -111,12 +127,25 @@ public abstract class RoleBase extends AbstractRole {
 
 	@Override
 	public void finish() {
-		System.out.println("finish");
-		System.out.println("========COInfo========");
-		System.out.println("Comingout Agents:" + coInfo.getCOAgentList());
-		System.out.println("Medium CO:" + coInfo.getCOAgentList(Role.MEDIUM));
-		System.out.println("Seer CO:" + coInfo.getCOAgentList(Role.SEER));
-		System.out.println("=============================================");
+		try {
+			System.out.println("finish");
+			System.out.println("========COInfo========");
+			System.out.println("Comingout Agents:" + coInfo.getCOAgentList());
+			System.out.println("Medium CO:" + coInfo.getCOAgentList(Role.MEDIUM));
+			System.out.println("Seer CO:" + coInfo.getCOAgentList(Role.SEER));
+			System.out.println("========TalkInfo========");
+			for (Agent agent : getLatestDayGameInfo().getAgentList()) {
+				System.out.println(agent + " Talk times:" + talkInfo.getTalkTimes(agent));
+			}
+			Agent testAgent = getMe();
+			System.out.println(testAgent + " talk:");
+			for (Talk talk : talkInfo.getTalkList(testAgent)) {
+				System.out.println(talk);
+			}
+			System.out.println("=============================================");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -157,5 +186,13 @@ public abstract class RoleBase extends AbstractRole {
 	 */
 	public FirstPersonEvaluator getEvaluator() {
 		return evaluator;
+	}
+
+	/**
+	 * 投票先を決定するためのオブジェクトを返します。
+	 * @return 投票先を決定するためのオブジェクト
+	 */
+	public VoteTargetSelector getVoteTargetSelector() {
+		return voteTargetSelector;
 	}
 }

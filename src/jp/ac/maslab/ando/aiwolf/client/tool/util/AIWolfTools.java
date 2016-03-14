@@ -1,6 +1,10 @@
 package jp.ac.maslab.ando.aiwolf.client.tool.util;
 
+import java.util.List;
+import java.util.Random;
+
 import org.aiwolf.client.lib.Utterance;
+import org.aiwolf.common.data.Agent;
 import org.aiwolf.common.data.Talk;
 
 import jp.ac.maslab.ando.aiwolf.client.data.Comingout;
@@ -22,4 +26,13 @@ public class AIWolfTools {
 		return co;
 	}
 
+	/**
+	 * 指定されたエージェントのリストからランダムに選択したエージェントを返します。
+	 * @param agentList エージェントのリスト
+	 * @return ランダムに選択されたエージェント
+	 */
+	public static Agent getRandomAgent(List<Agent> agentList) {
+		Random rand = new Random();
+		return agentList.get(rand.nextInt(agentList.size()));
+	}
 }
