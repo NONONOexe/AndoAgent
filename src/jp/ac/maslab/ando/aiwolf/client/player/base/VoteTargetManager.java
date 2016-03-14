@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.aiwolf.common.data.Agent;
 
 /**
- * 投票先を決定します。
+ * 投票先を時間で管理します。
  * @author keisuke
  */
-public class VoteTargetSelector {
+public class VoteTargetManager {
 	/**
-	 * 時間を取得するためのオブジェクト
+	 * 時間を取得するためのオブジェクトです。
 	 */
 	private TimeManager timeManager;
 	/**
@@ -26,7 +25,7 @@ public class VoteTargetSelector {
 	 * 投票先を決定するためのオブジェクトを構築します。
 	 * @param timeManager 時間を取得するためのオブジェクト
 	 */
-	public VoteTargetSelector(TimeManager timeManager) {
+	public VoteTargetManager(TimeManager timeManager) {
 		this.timeManager = timeManager;
 		this.timeTargetMap = new LinkedHashMap<>();
 	}
@@ -36,23 +35,13 @@ public class VoteTargetSelector {
 	 * @return 今日の投票先が決定しているならtrue、そうでない場合はfalse
 	 */
 	public boolean isDecided() {
-		int today = -1;
-		try {
-			today = timeManager.getCurrent().getDay();
-		} catch (Exception e) {
-			System.err.println(timeManager.getCurrent());
-		}
-		for (Entry<Time, Agent> timeTarget : timeTargetMap.entrySet()) {
-			if (timeTarget.getKey().getDay() == today) {
+		int today = timeManager.getCurrent().getDay();
+		for (Time time : timeTargetMap.keySet()) {
+			if (time.getDay() == today) {
 				return true;
 			}
 		}
 		return false;
-	}
-
-	public void test() {
-		System.out.println(isDecided());
-		System.out.println(timeTargetMap);
 	}
 
 	/**
@@ -60,7 +49,7 @@ public class VoteTargetSelector {
 	 * @param voteTarget 投票先のエージェント
 	 */
 	public void setVoteTarget(Agent voteTarget) {
-		if (timeManager.getCurrent().getDay() < 0) {
+		if (voteTarget == null) {
 			return;
 		}
 		this.timeTargetMap.put(timeManager.getCurrent(), voteTarget);

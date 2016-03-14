@@ -96,12 +96,11 @@ public final class Seer extends SeerBase {
 	@Override
 	public String talk() {
 		try {
-			getVoteTargetSelector().test();
-			getVoteTargetSelector().setVoteTarget(selectVoteTarget());
+			getVoteTargetManager().setVoteTarget(selectVoteTarget());
 
 			if (!getTalkInfo().hasTalked(getDay(), getMe(), Topic.VOTE)
-					|| getVoteTargetSelector().hasChangedTarget()) {
-				return TemplateTalkFactory.vote(getVoteTargetSelector().getVoteTarget());
+					|| getVoteTargetManager().hasChangedTarget()) {
+				return TemplateTalkFactory.vote(getVoteTargetManager().getVoteTarget());
 			}
 
 			if (hasTalkedDoubtful == false) {
@@ -141,7 +140,7 @@ public final class Seer extends SeerBase {
 	}
 
 	public Agent selectVoteTarget() {
-		Agent voteTarget = getVoteTargetSelector().getVoteTarget();
+		Agent voteTarget = getVoteTargetManager().getVoteTarget();
 		if (!getRoleForecast().getBlackAgentList().isEmpty()
 				&& !getRoleForecast().getBlackAgentList().contains(voteTarget)) {
 			return AIWolfTools.getRandomAgent(getRoleForecast().getBlackAgentList());
@@ -156,6 +155,6 @@ public final class Seer extends SeerBase {
 
 	@Override
 	public Agent vote() {
-		return getVoteTargetSelector().getVoteTarget();
+		return getVoteTargetManager().getVoteTarget();
 	}
 }

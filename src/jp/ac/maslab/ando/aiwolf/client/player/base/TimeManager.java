@@ -2,7 +2,7 @@ package jp.ac.maslab.ando.aiwolf.client.player.base;
 
 /**
  * 時間の管理を行います。
- * @author keisuke
+ * @author ando
  */
 public class TimeManager {
 	/**
@@ -14,21 +14,17 @@ public class TimeManager {
 	 * 新しく時間の管理を行うオブジェクトを構築します。
 	 */
 	public TimeManager() {
-		current = new Time(-1, -1);
-	}
-
-	/**
-	 * 時間を次の日に進めます。
-	 */
-	public void moveNextDay() {
-		current = new Time(current.getDay() + 1, -1);
 	}
 
 	/**
 	 * 時間を次のターンに進めます。
 	 */
-	public void moveNextTurn() {
-		current = new Time(current.getDay(), current.getTurn() + 1);
+	public void moveNextTurn(int day) {
+		if (current == null || current.getDay() != day) {
+			current = new Time(day, 0);
+			return;
+		}
+		current = new Time(day, current.getTurn() + 1);
 	}
 
 	/**

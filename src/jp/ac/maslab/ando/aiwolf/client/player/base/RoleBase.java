@@ -26,6 +26,10 @@ public abstract class RoleBase extends AbstractRole {
 	 */
 	private int readTalkNum;
 	/**
+	 * 時間を管理します。
+	 */
+	private TimeManager timeManager;
+	/**
 	 * COに関する情報を保持します。
 	 */
 	private COInfo coInfo;
@@ -46,106 +50,74 @@ public abstract class RoleBase extends AbstractRole {
 	 */
 	private FirstPersonEvaluator evaluator;
 	/**
-	 * 時間を管理します。
-	 */
-	private TimeManager timeManager;
-	/**
 	 * 投票先を決定します。
 	 */
-	private VoteTargetSelector voteTargetSelector;
-
-	/**
-	 * 全役職の共通戦略を構築します。
-	 */
-	public RoleBase() {
-	}
+	private VoteTargetManager voteTargetManager;
 
 	@Override
 	public void initialize(GameInfo gameInfo, GameSetting gameSetting) {
 		super.initialize(gameInfo, gameSetting);
-		coInfo = new COInfo(gameSetting.getRoleNumMap());
-		talkInfo = new TalkInfo(gameInfo.getAgentList());
-		viabilityInfo = new ViabilityInfo(gameInfo.getAgentList());
-		roleForecast = new RoleForecast(gameInfo.getAgentList());
-		evaluator = new FirstPersonEvaluator(gameInfo.getAgentList(), getMe());
-		timeManager = new TimeManager();
-		voteTargetSelector = new VoteTargetSelector(timeManager);
+		this.timeManager = new TimeManager();
+		this.coInfo = new COInfo(gameSetting.getRoleNumMap());
+		this.talkInfo = new TalkInfo(gameInfo.getAgentList());
+		this.viabilityInfo = new ViabilityInfo(gameInfo.getAgentList());
+		this.roleForecast = new RoleForecast(gameInfo.getAgentList());
+		this.evaluator = new FirstPersonEvaluator(gameInfo.getAgentList(), getMe(), timeManager);
+		this.voteTargetManager = new VoteTargetManager(timeManager);
 	}
 
 	@Override
 	public void dayStart() {
-		// 日にちを進める
-		timeManager.moveNextDay();
-
-		// readTalkNumの初期化
-		readTalkNum = 0;
-
-		// ====FirstPersonEvaluatorの更新====
-		// 投票を評価
-		evaluator.evaluateVote(getLatestDayGameInfo().getVoteList());
-
-		// ====ViabilityInfoの更新====
-		// 処刑されたエージェントを死亡エージェントに追加
-		if (super.getLatestDayGameInfo().getExecutedAgent() != null) {
-			viabilityInfo.addDeadAgent(
-					super.getLatestDayGameInfo().getExecutedAgent());
-		}
-		// 襲撃されたエージェントを死亡エージェントに追加
-		if (super.getLatestDayGameInfo().getAttackedAgent() != null) {
-			viabilityInfo.addDeadAgent(
-					super.getLatestDayGameInfo().getAttackedAgent());
-		}
+		// readTalkNumを初期化します。
+		this.readTalkNum = 0;
+		// 投票を評価します。
+		this.evaluator.evaluateVote(getLatestDayGameInfo().getVoteList());
+		// 処刑されたエージェントを設定します。
+		this.viabilityInfo.setExecuted(getDay(), getLatestDayGameInfo().getExecutedAgent());
+		// 襲撃されたエージェントを設定します。
+		this.viabilityInfo.setAttacked(getDay(), getLatestDayGameInfo().getAttackedAgent());
 	}
 
 	@Override
 	public void update(GameInfo gameInfo) {
 		super.update(gameInfo);
-		// ターンを進める
-		timeManager.moveNextTurn();
-
+		// ターンを進めます。
+		timeManager.moveNextTurn(this.getDay());
+		// 今日のtalkListに対する処理部分です。
 		List<Talk> talkList = gameInfo.getTalkList();
-
-		while (readTalkNum < gameInfo.getTalkList().size()) {
+		while (readTalkNum < talkList.size()) {
 			Talk talk = talkList.get(readTalkNum);
-
 			// TopicがCominoutのTalkから、COInfoを更新します。
 			Utterance utterance = new Utterance(talk.getContent());
 			if (utterance.getTopic().equals(Topic.COMINGOUT)) {
 				coInfo.addComingout(AIWolfTools.convertToComingout(talk));
 			}
-
 			// talkInfoにtalkを追加します。
 			talkInfo.addTalk(talk);
-
-			// ====FirstPersonEvaluatorの更新====
-			// 会話を評価
+			// 会話を評価します。
 			evaluator.evaluateTalk(talk);
-
+			// readTalkNumをインクリメントします。
 			readTalkNum++;
 		}
 	}
 
 	@Override
 	public void finish() {
-		try {
-			System.out.println("finish");
-			System.out.println("========COInfo========");
-			System.out.println("Comingout Agents:" + coInfo.getCOAgentList());
-			System.out.println("Medium CO:" + coInfo.getCOAgentList(Role.MEDIUM));
-			System.out.println("Seer CO:" + coInfo.getCOAgentList(Role.SEER));
-			System.out.println("========TalkInfo========");
-			for (Agent agent : getLatestDayGameInfo().getAgentList()) {
-				System.out.println(agent + " Talk times:" + talkInfo.getTalkTimes(agent));
-			}
-			Agent testAgent = getMe();
-			System.out.println(testAgent + " talk:");
-			for (Talk talk : talkInfo.getTalkList(testAgent)) {
-				System.out.println(talk);
-			}
-			System.out.println("=============================================");
-		} catch (Exception e) {
-			e.printStackTrace();
+		System.out.println("finish");
+		System.out.println("========COInfo========");
+		System.out.println("Comingout Agents:" + coInfo.getCOAgentList());
+		System.out.println("Medium CO:" + coInfo.getCOAgentList(Role.MEDIUM));
+		System.out.println("Seer CO:" + coInfo.getCOAgentList(Role.SEER));
+		System.out.println("========TalkInfo========");
+		for (Agent agent : getLatestDayGameInfo().getAgentList()) {
+			System.out.println(agent + " Talk times:" + talkInfo.getTalkTimes(agent));
 		}
+		Agent testAgent = getMe();
+		System.out.println(testAgent + " talk:");
+		for (Talk talk : talkInfo.getTalkList(testAgent)) {
+			System.out.println(talk);
+		}
+		System.out.println("=============================================");
 	}
 
 	/**
@@ -182,17 +154,17 @@ public abstract class RoleBase extends AbstractRole {
 
 	/**
 	 * 各エージェントの評価に関するオブジェクトを返します。
-	 * @return
+	 * @return 各エージェントの評価に関するオブジェクト
 	 */
 	public FirstPersonEvaluator getEvaluator() {
 		return evaluator;
 	}
 
 	/**
-	 * 投票先を決定するためのオブジェクトを返します。
-	 * @return 投票先を決定するためのオブジェクト
+	 * 投票先を管理するためのオブジェクトを返します。
+	 * @return 投票先を管理するためのオブジェクト
 	 */
-	public VoteTargetSelector getVoteTargetSelector() {
-		return voteTargetSelector;
+	public VoteTargetManager getVoteTargetManager() {
+		return voteTargetManager;
 	}
 }

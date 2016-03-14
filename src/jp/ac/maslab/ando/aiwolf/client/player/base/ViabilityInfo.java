@@ -1,7 +1,10 @@
 package jp.ac.maslab.ando.aiwolf.client.player.base;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.aiwolf.common.data.Agent;
 
@@ -12,48 +15,69 @@ import org.aiwolf.common.data.Agent;
  */
 public class ViabilityInfo {
 	/**
-	 * 生存しているエージェントのリストです。
+	 * ゲームに参加している全エージェントのリスト
 	 */
-	private List<Agent> aliveAgentList;
+	private List<Agent> agentList;
 	/**
-	 * 死亡しているエージェントのリストです。
+	 * 日付と処刑されたエージェントのマップです。
 	 */
-	private List<Agent> deadAgentList;
+	private Map<Integer, Agent> executedMap;
+	/**
+	 * 日付と襲撃されたエージェントのマップです。
+	 */
+	private Map<Integer, Agent> attackedMap;
 
 	/**
 	 * 各エージェントの生死に関わる情報のオブジェクトを構築します。
 	 * @param agentList 全エージェントのリスト
 	 */
 	public ViabilityInfo(List<Agent> agentList) {
-		aliveAgentList = new ArrayList<>(agentList);
-		deadAgentList = new ArrayList<>();
+		this.agentList = agentList;
 	}
 
 	/**
-	 * 死亡したエージェントを追加します。
-	 * @param deadAgent 死亡したエージェント
+	 * 処刑されたエージェントを設定します。エージェントが<code>null</code>の場合は何もしません。
+	 * @param day 日付
+	 * @param agent 処刑されたエージェント
 	 */
-	public void addDeadAgent(Agent deadAgent) {
-		deadAgentList.add(deadAgent);
-		aliveAgentList.remove(deadAgent);
+	public void setExecuted(int day, Agent agent) {
+		if (agent == null) {
+			return;
+		}
+		this.executedMap.put(day, agent);
 	}
 
 	/**
-	 * 指定されたエージェントから生存しているエージェントだけを返します。
-	 * @param agentList エージェントのリスト
-	 * @return 指定されたエージェントの中で生存しているエージェント
+	 * 襲撃されたエージェントを設定します。エージェントが<code>null</code>の場合は何もしません。
+	 * @param day 日付
+	 * @param agent 襲撃されたエージェント
 	 */
-	public List<Agent> getAliveAgentList(List<Agent> agentList) {
-		List<Agent> aliveAgentList = new ArrayList<>(agentList);
-		aliveAgentList.retainAll(this.aliveAgentList);
-		return aliveAgentList;
+	public void setAttacked(int day, Agent agent) {
+		if (agent == null) {
+			return;
+		}
+		this.attackedMap.put(day, agent);
 	}
 
 	/**
-	 * 生存しているエージェントを返します。
-	 * @return 生存しているエージェント
+	 * 生存しているエージェントをリストで返します。
+	 * @return 生存しているエージェントのリスト
 	 */
 	public List<Agent> getAliveAgentList() {
+		List<Agent> aliveAgentList = new ArrayList<>(this.agentList);
+		aliveAgentList.removeAll(this.executedMap.values());
+		aliveAgentList.removeAll(this.attackedMap.values());
 		return aliveAgentList;
+	}
+
+	/**
+	 * 死亡しているエージェントをリストで返します。
+	 * @return 死亡しているエージェントのリスト
+	 */
+	public List<Agent> getDeadAgentList() {
+		Set<Agent> deadAgentList = new HashSet<>();
+		deadAgentList.addAll(this.executedMap.values());
+		deadAgentList.addAll(this.attackedMap.values());
+		return new ArrayList<>(deadAgentList);
 	}
 }

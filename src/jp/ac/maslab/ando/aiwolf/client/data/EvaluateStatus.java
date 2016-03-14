@@ -2,7 +2,7 @@ package jp.ac.maslab.ando.aiwolf.client.data;
 
 /**
  * 各エージェントの評価する状況です。
- * @author keisuke
+ * @author ando
  */
 public enum EvaluateStatus {
 	/**
