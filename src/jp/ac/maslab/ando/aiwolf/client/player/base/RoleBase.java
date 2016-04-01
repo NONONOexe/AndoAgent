@@ -76,6 +76,23 @@ public abstract class RoleBase extends AbstractRole {
 		this.viabilityInfo.setExecuted(getDay(), getLatestDayGameInfo().getExecutedAgent());
 		// 襲撃されたエージェントを設定します。
 		this.viabilityInfo.setAttacked(getDay(), getLatestDayGameInfo().getAttackedAgent());
+		// 情報を表示します。
+		System.out.println("dayStart");
+		System.out.println("========Evaluator========");
+		for (Agent agent : getLatestDayGameInfo().getAgentList()) {
+			if (agent.equals(getMe())) {
+				continue;
+			}
+			System.out.print(agent + " " + evaluator.getEvaluateValue(agent));
+			if (evaluator.getConvictionAgentList().contains(agent)) {
+				System.out.print(" conviction");
+			}
+			if (evaluator.getDoubtfulAgentList().contains(agent)) {
+				System.out.print(" doubtful");
+			}
+			System.out.println();
+		}
+		System.out.println("=============================================");
 	}
 
 	@Override
@@ -99,10 +116,15 @@ public abstract class RoleBase extends AbstractRole {
 			// readTalkNumをインクリメントします。
 			readTalkNum++;
 		}
+		// 情報を表示します。
+		System.out.println("update");
+		System.out.println("Vote target:" + timeManager.getCurrent() + " " + voteTargetManager.getVoteTarget());
+		System.out.println("=============================================");
 	}
 
 	@Override
 	public void finish() {
+		// 情報を表示します。
 		System.out.println("finish");
 		System.out.println("========COInfo========");
 		System.out.println("Comingout Agents:" + coInfo.getCOAgentList());
@@ -113,9 +135,30 @@ public abstract class RoleBase extends AbstractRole {
 			System.out.println(agent + " Talk times:" + talkInfo.getTalkTimes(agent));
 		}
 		Agent testAgent = getMe();
-		System.out.println(testAgent + " talk:");
+		System.out.println("=" + testAgent + " talk=");
 		for (Talk talk : talkInfo.getTalkList(testAgent)) {
 			System.out.println(talk);
+		}
+		System.out.println("========Evaluator========");
+		for (Agent agent : getLatestDayGameInfo().getAgentList()) {
+			if (agent.equals(getMe())) {
+				continue;
+			}
+			System.out.print(agent + " " + evaluator.getEvaluateValue(agent));
+			if (evaluator.getConvictionAgentList().contains(agent)) {
+				System.out.print(" conviction");
+			}
+			if (evaluator.getDoubtfulAgentList().contains(agent)) {
+				System.out.print(" doubtful");
+			}
+			System.out.println();
+		}
+		System.out.println("========ViabilityInfo========");
+		if (getViabilityInfo().isAlive(getMe())) {
+			System.out.println("You Alive!");
+		}
+		if (getViabilityInfo().isDead(getMe())) {
+			System.out.println("You Dead!");
 		}
 		System.out.println("=============================================");
 	}

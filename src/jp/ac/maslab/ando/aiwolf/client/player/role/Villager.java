@@ -1,7 +1,6 @@
 package jp.ac.maslab.ando.aiwolf.client.player.role;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.aiwolf.client.lib.TemplateTalkFactory;
@@ -15,7 +14,7 @@ import jp.ac.maslab.ando.aiwolf.client.player.base.VillagerBase;
 
 /**
  * 村人の行動を定義するクラスです。
- * @author keisuke
+ * @author ando
  */
 public final class Villager extends VillagerBase {
 	/**
@@ -51,28 +50,27 @@ public final class Villager extends VillagerBase {
 
 	@Override
 	public void dayStart() {
-		super.dayStart();
-		hasChangedTarget = true;
-		hasTalkedDoubtful = false;
-		hasTalkedConviction = false;
-		voteTarget = null;
-
-		if (getLatestDayGameInfo().getAttackedAgent() != null) {
-			// 襲撃されたエージェントを白と判定
-			getRoleForecast().estimateWhite(getLatestDayGameInfo().getAttackedAgent());
-
-			// 占いまたは霊能COが2人以上いたときに1人が襲撃されたことで残りのCOしたエージェントが黒だと判明したときの処理
-			for (Role role : Arrays.asList(Role.SEER, Role.MEDIUM)) {
-				if (getCOInfo().isOverCapatityCORole(role)
-						&& getCOInfo().getCOAgentList(role).contains(getLatestDayGameInfo().getAttackedAgent())) {
-					List<Agent> blackAgentList = new ArrayList<>();
-					blackAgentList.addAll(getCOInfo().getCOAgentList(role));
-					blackAgentList.remove(getLatestDayGameInfo().getAttackedAgent());
-					getRoleForecast().estimateBlack(blackAgentList);
-					getRoleForecast().estimateRole(getLatestDayGameInfo().getAttackedAgent(), role);
-				}
+		try {
+			super.dayStart();
+			// 襲撃されたエージェントを白と判定します。
+			if (getLatestDayGameInfo().getAttackedAgent() != null) {
+				getRoleForecast().estimateWhite(getLatestDayGameInfo().getAttackedAgent());
 			}
+			// 霊能COしたエージェントが2人以上いる状態で1人が襲撃された場合です
+			if (getLatestDayGameInfo().getAttackedAgent() != null
+					&& getCOInfo().isOverCapatityCORole(Role.MEDIUM)
+					&& getCOInfo().getCOAgentList(Role.MEDIUM).contains(getLatestDayGameInfo().getAttackedAgent())) {
+				List<Agent> blackAgentList = new ArrayList<>();
+				blackAgentList.addAll(getCOInfo().getCOAgentList(role));
+				blackAgentList.remove(getLatestDayGameInfo().getAttackedAgent());
+				getRoleForecast().estimateBlack(blackAgentList);
+				getRoleForecast().estimateRole(getLatestDayGameInfo().getAttackedAgent(), role);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
+
 	}
 
 	@Override

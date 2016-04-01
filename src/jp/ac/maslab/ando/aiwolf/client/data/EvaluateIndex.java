@@ -1,10 +1,10 @@
 package jp.ac.maslab.ando.aiwolf.client.data;
 
 /**
- * 各エージェントの評価する状況です。
+ * 各エージェントの評価指標です。
  * @author ando
  */
-public enum EvaluateStatus {
+public enum EvaluateIndex {
 	/**
 	 * 他のエージェントに人狼と占われることを示します。
 	 */

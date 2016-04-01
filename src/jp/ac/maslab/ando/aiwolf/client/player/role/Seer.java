@@ -122,7 +122,7 @@ public final class Seer extends SeerBase {
 					}
 				}
 			}
-			return Talk.SKIP;
+			return Talk.OVER;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Talk.SKIP;

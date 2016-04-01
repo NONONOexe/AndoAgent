@@ -24,7 +24,7 @@ public class FirstPersonEvaluator {
 	/**
 	 * 各振る舞いに対する重みを示します。
 	 */
-	private Map<EvaluateStatus, Double> weightMap;
+	private Map<EvaluateIndex, Double> weightMap;
 	/**
 	 * 各エージェントの評価値です。
 	 */
@@ -66,21 +66,21 @@ public class FirstPersonEvaluator {
 	 */
 	private void initializeWeightMap() {
 		this.weightMap = new HashMap<>();
-		this.weightMap.put(EvaluateStatus.DIVINED_WOLF, 5.0D);
-		this.weightMap.put(EvaluateStatus.DIVINED_HUMAN, -3.0D);
-		this.weightMap.put(EvaluateStatus.DIVINE_ME_WOLF, 15.0D);
-		this.weightMap.put(EvaluateStatus.DIVINE_ME_HUMAN, -3.0D);
-		this.weightMap.put(EvaluateStatus.SAME_VOTE, -2.0D);
-		this.weightMap.put(EvaluateStatus.VOTE_ME, 2.0D);
-		this.weightMap.put(EvaluateStatus.VOTED, 1.0D);
-		this.weightMap.put(EvaluateStatus.SEER_CO, -0.5D);
-		this.weightMap.put(EvaluateStatus.MEDIUM_CO, -0.5D);
-		this.weightMap.put(EvaluateStatus.VILLAGER_CO, 1.0D);
-		this.weightMap.put(EvaluateStatus.POSSESSED_CO, 4.0D);
-		this.weightMap.put(EvaluateStatus.WEREWOLF_CO, 15.0D);
-		this.weightMap.put(EvaluateStatus.BODYGUARD_CO, 3.0D);
-		this.weightMap.put(EvaluateStatus.AGREED_OPINION, 0.5D);
-		this.weightMap.put(EvaluateStatus.DISAGREED_OPINION, -0.5D);
+		this.weightMap.put(EvaluateIndex.DIVINED_WOLF, 5.0D);
+		this.weightMap.put(EvaluateIndex.DIVINED_HUMAN, -3.0D);
+		this.weightMap.put(EvaluateIndex.DIVINE_ME_WOLF, 15.0D);
+		this.weightMap.put(EvaluateIndex.DIVINE_ME_HUMAN, -3.0D);
+		this.weightMap.put(EvaluateIndex.SAME_VOTE, -2.0D);
+		this.weightMap.put(EvaluateIndex.VOTE_ME, 2.0D);
+		this.weightMap.put(EvaluateIndex.VOTED, 1.0D);
+		this.weightMap.put(EvaluateIndex.SEER_CO, -0.5D);
+		this.weightMap.put(EvaluateIndex.MEDIUM_CO, -0.5D);
+		this.weightMap.put(EvaluateIndex.VILLAGER_CO, 1.0D);
+		this.weightMap.put(EvaluateIndex.POSSESSED_CO, 4.0D);
+		this.weightMap.put(EvaluateIndex.WEREWOLF_CO, 15.0D);
+		this.weightMap.put(EvaluateIndex.BODYGUARD_CO, 3.0D);
+		this.weightMap.put(EvaluateIndex.AGREED_OPINION, 0.5D);
+		this.weightMap.put(EvaluateIndex.DISAGREED_OPINION, -0.5D);
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class FirstPersonEvaluator {
 	 * @param voteList 投票のリスト
 	 */
 	public void evaluateVote(List<Vote> voteList) {
-		Vote myVote = getMyVote(voteList);
+		Vote myVote = searchMyVote(voteList);
 		for (Vote vote : voteList) {
 			this.evaluateVote(vote, myVote);
 		}
@@ -99,7 +99,7 @@ public class FirstPersonEvaluator {
 	 * @param voteList 投票のリスト
 	 * @return 自分の投票
 	 */
-	private Vote getMyVote(List<Vote> voteList) {
+	private Vote searchMyVote(List<Vote> voteList) {
 		for (Vote vote : voteList) {
 			if (vote.getAgent().equals(me)) {
 				return vote;
@@ -114,45 +114,17 @@ public class FirstPersonEvaluator {
 	 * @param myVote 自分の投票
 	 */
 	private void evaluateVote(Vote vote, Vote myVote) {
+		// 投票先が自分の場合です。
+		if (vote.getTarget().equals(me)) {
+			this.updateEvalMap(vote.getAgent(), this.getEvalVoteMe());
+			return;
+		}
 		// 投票先が自分と同じ場合です。
 		if (myVote != null && vote.getTarget().equals(myVote.getTarget())) {
 			this.updateEvalMap(vote.getAgent(), this.getEvalSameVote());
 		}
-		// 投票先が自分の場合です。
-		if (vote.getTarget().equals(me)) {
-			this.updateEvalMap(vote.getAgent(), this.getEvalVoteMe());
-		}
 		// 投票されたエージェントにマイナス評価値を加えます。
-		else {
-			this.updateEvalMap(vote.getTarget(), this.getEvalVoted());
-		}
-	}
-
-	/**
-	 * 自分と投票先が同じエージェントに対する評価値を返します。
-	 * @return 自分と投票先が同じエージェントに対する評価値
-	 */
-	private Double getEvalSameVote() {
-		double coefficient = 1.0D + this.timeManager.getCurrent().getDay() / 10.0D;
-		return this.weightMap.get(EvaluateStatus.SAME_VOTE) * coefficient;
-	}
-
-	/**
-	 * 自分に投票したエージェントに対する評価値を返します。
-	 * @return 自分に投票したエージェントに対する評価値
-	 */
-	private Double getEvalVoteMe() {
-		double coefficient = 1.0D + this.timeManager.getCurrent().getDay() / 10.0D;
-		return this.weightMap.get(EvaluateStatus.SAME_VOTE) * coefficient;
-	}
-
-	/**
-	 * 投票されたエージェントに対する評価値を返します。
-	 * @return 投票されたエージェントに対する評価値
-	 */
-	private Double getEvalVoted() {
-		double coefficient = 1.0D + this.timeManager.getCurrent().getDay() / 10.0D;
-		return this.weightMap.get(EvaluateStatus.VOTED) * coefficient;
+		this.updateEvalMap(vote.getTarget(), this.getEvalVoted());
 	}
 
 	/**
@@ -161,7 +133,61 @@ public class FirstPersonEvaluator {
 	 * @param variation 評価値の変化量
 	 */
 	private void updateEvalMap(Agent agent, Double variation) {
+		if (agent.equals(me)) {
+			return;
+		}
 		agentEvalMap.put(agent, agentEvalMap.get(agent) + variation);
+	}
+
+	/**
+	 * 自分に投票したエージェントに対する評価値を返します。<br>
+	 * 評価値は次のように計算されます。
+	 * <blockquote>
+	 * VOTE_ME : 投票先が自分であること<br>
+	 * W(status) : 評価指標statusに対する重み<br>
+	 * day : 日数<br>
+	 * <br>
+	 * 評価値 = W(VOTE_ME) * (1.0 + day * 0.1)
+	 * </blockquote>
+	 * @return 自分に投票したエージェントに対する評価値
+	 */
+	private Double getEvalVoteMe() {
+		double coefficient = 1.0D + this.timeManager.getCurrent().getDay() / 10.0D;
+		return this.weightMap.get(EvaluateIndex.VOTE_ME) * coefficient;
+	}
+
+	/**
+	 * 自分と投票先が同じエージェントに対する評価値を返します。<br>
+	 * 評価値は次のように計算されます。
+	 * <blockquote>
+	 * SAME_VOTE : 自分と投票先が同じであること<br>
+	 * W(status) : 評価指標statusに対する重み<br>
+	 * day : 日数<br>
+	 * <br>
+	 * 評価値 = W(SAME_VOTE) * (1.0 + day * 0.1)
+	 * </blockquote>
+	 * @return 自分と投票先が同じエージェントに対する評価値
+	 */
+	private Double getEvalSameVote() {
+		double coefficient = 1.0D + this.timeManager.getCurrent().getDay() * 0.1D;
+		return this.weightMap.get(EvaluateIndex.SAME_VOTE) * coefficient;
+	}
+
+	/**
+	 * 投票されたエージェントに対する評価値を返します。<br>
+	 * 評価値は次のように計算されます。
+	 * <blockquote>
+	 * VOTED : 投票されたこと<br>
+	 * W(status) : 評価指標statusに対する重み<br>
+	 * day : 日数<br>
+	 * <br>
+	 * 評価値 = W(VOTED) * (1.0 + day * 0.1)
+	 * </blockquote>
+	 * @return 投票されたエージェントに対する評価値
+	 */
+	private Double getEvalVoted() {
+		double coefficient = 1.0D + this.timeManager.getCurrent().getDay() / 10.0D;
+		return this.weightMap.get(EvaluateIndex.VOTED) * coefficient;
 	}
 
 	/**
@@ -184,20 +210,24 @@ public class FirstPersonEvaluator {
 	 * @param divined 占い結果の発言
 	 */
 	private void evaluateDivined(Divined divined) {
+		// 自分が人狼と占われた場合です
 		if (divined.getTarget().equals(me) && this.isWolf(divined.getResult())) {
-			updateEvalMap(divined.getAgent(), weightMap.get(EvaluateStatus.DIVINE_ME_WOLF));
+			updateEvalMap(divined.getAgent(), weightMap.get(EvaluateIndex.DIVINE_ME_WOLF));
 			return;
 		}
+		// 自分が人間と占われた場合です
 		if (divined.getTarget().equals(me) && this.isHuman(divined.getResult())) {
-			updateEvalMap(divined.getAgent(), weightMap.get(EvaluateStatus.DIVINE_ME_HUMAN));
+			updateEvalMap(divined.getAgent(), weightMap.get(EvaluateIndex.DIVINE_ME_HUMAN));
 			return;
 		}
-		if (!divined.getTarget().equals(me) && this.isWolf(divined.getResult())) {
-			updateEvalMap(divined.getTarget(), weightMap.get(EvaluateStatus.DIVINED_WOLF));
+		// 他人が人狼と占われた場合です
+		if (this.isWolf(divined.getResult())) {
+			updateEvalMap(divined.getTarget(), weightMap.get(EvaluateIndex.DIVINED_WOLF));
 			return;
 		}
-		if (!divined.getTarget().equals(me) && this.isHuman(divined.getResult())) {
-			updateEvalMap(divined.getTarget(), weightMap.get(EvaluateStatus.DIVINED_HUMAN));
+		// 他人が人間と占われた場合です
+		if (this.isHuman(divined.getResult())) {
+			updateEvalMap(divined.getTarget(), weightMap.get(EvaluateIndex.DIVINED_HUMAN));
 			return;
 		}
 	}
@@ -228,22 +258,22 @@ public class FirstPersonEvaluator {
 	private void evaluateComingout(Comingout co) {
 		switch (co.getRole()) {
 		case BODYGUARD:
-			updateEvalMap(co.getAgent(), weightMap.get(EvaluateStatus.BODYGUARD_CO));
+			updateEvalMap(co.getAgent(), weightMap.get(EvaluateIndex.BODYGUARD_CO));
 			break;
 		case MEDIUM:
-			updateEvalMap(co.getAgent(), weightMap.get(EvaluateStatus.MEDIUM_CO));
+			updateEvalMap(co.getAgent(), weightMap.get(EvaluateIndex.MEDIUM_CO));
 			break;
 		case POSSESSED:
-			updateEvalMap(co.getAgent(), weightMap.get(EvaluateStatus.POSSESSED_CO));
+			updateEvalMap(co.getAgent(), weightMap.get(EvaluateIndex.POSSESSED_CO));
 			break;
 		case SEER:
-			updateEvalMap(co.getAgent(), weightMap.get(EvaluateStatus.SEER_CO));
+			updateEvalMap(co.getAgent(), weightMap.get(EvaluateIndex.SEER_CO));
 			break;
 		case VILLAGER:
-			updateEvalMap(co.getAgent(), weightMap.get(EvaluateStatus.VILLAGER_CO));
+			updateEvalMap(co.getAgent(), weightMap.get(EvaluateIndex.VILLAGER_CO));
 			break;
 		case WEREWOLF:
-			updateEvalMap(co.getAgent(), weightMap.get(EvaluateStatus.WEREWOLF_CO));
+			updateEvalMap(co.getAgent(), weightMap.get(EvaluateIndex.WEREWOLF_CO));
 			break;
 		default:
 			break;
@@ -259,6 +289,9 @@ public class FirstPersonEvaluator {
 		List<Agent> doubtfulAgentList = new ArrayList<>();
 		double max = Double.MIN_VALUE;
 		for (Agent agent : agentList) {
+			if (agent.equals(me)) {
+				continue;
+			}
 			if (max < agentEvalMap.get(agent)) {
 				doubtfulAgentList.clear();
 				doubtfulAgentList.add(agent);
@@ -279,11 +312,14 @@ public class FirstPersonEvaluator {
 		List<Agent> convictionAgentList = new ArrayList<>();
 		double min = Double.MAX_VALUE;
 		for (Agent agent : agentList) {
+			if (agent.equals(me)) {
+				continue;
+			}
 			if (agentEvalMap.get(agent) < min) {
 				convictionAgentList.clear();
 				convictionAgentList.add(agent);
 				min = agentEvalMap.get(agent);
-			} else if (agentEvalMap.get(agent) < min) {
+			} else if (agentEvalMap.get(agent) == min) {
 				convictionAgentList.add(agent);
 			}
 		}
@@ -304,5 +340,17 @@ public class FirstPersonEvaluator {
 	 */
 	public List<Agent> getConvictionAgentList() {
 		return getConvictionAgentList(agentEvalMap.keySet());
+	}
+
+	/**
+	 * 指定されたエージェントの評価値を返します。ただし、自分の評価は正しくできないため、0.0を返します。
+	 * @param agent 評価値を調べたいエージェント
+	 * @return agentの評価値
+	 */
+	public double getEvaluateValue(Agent agent) {
+		if (agent.equals(me)) {
+			return 0.0D;
+		}
+		return agentEvalMap.get(agent);
 	}
 }

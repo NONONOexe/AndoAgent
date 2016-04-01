@@ -1,6 +1,7 @@
 package jp.ac.maslab.ando.aiwolf.client.player.base;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ public class ViabilityInfo {
 	 */
 	public ViabilityInfo(List<Agent> agentList) {
 		this.agentList = agentList;
+		this.executedMap = new HashMap<>();
+		this.attackedMap = new HashMap<>();
 	}
 
 	/**
@@ -79,5 +82,23 @@ public class ViabilityInfo {
 		deadAgentList.addAll(this.executedMap.values());
 		deadAgentList.addAll(this.attackedMap.values());
 		return new ArrayList<>(deadAgentList);
+	}
+
+	/**
+	 * 指定されたエージェントが生存しているかどうかを返します。
+	 * @param agent 生存しているかどうかを調べるエージェント
+	 * @return 生存しているならtrue、そうでない場合はfalse
+	 */
+	public boolean isAlive(Agent agent) {
+		return getAliveAgentList().contains(agent);
+	}
+
+	/**
+	 * 指定されたエージェントが死亡しているかどうかを返します。
+	 * @param agent 死亡しているかどうかを調べるエージェント
+	 * @return 死亡しているならtrue、そうでない場合はfalse
+	 */
+	public boolean isDead(Agent agent) {
+		return getDeadAgentList().contains(agent);
 	}
 }
